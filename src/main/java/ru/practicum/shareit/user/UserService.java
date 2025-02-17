@@ -52,7 +52,8 @@ public class UserService {
         users.stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findFirst()
-                .ifPresent( user -> {throw new SameEmailException("Уже есть пользователь с таким email " + email);
+                .ifPresent(user -> {
+                    throw new SameEmailException("Уже есть пользователь с таким email " + email);
                 });
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -10,6 +11,6 @@ public class NewItemRequest {
     private String name;
     @NotBlank(message = "Описание не может быть пустым")
     private String description;
-    @NotBlank(message = "Доступность не может быть пустым")
+    @NotNull(message = "Доступность не может отсутствовать")
     private Boolean available;
 }

@@ -2,8 +2,10 @@ package ru.practicum.shareit.item.storage;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,20 +28,23 @@ public class ItemStorageMemory implements ItemStorage {
        Collection<Item> usersItems =  items.values().stream()
                .filter(item -> item.getOwnerId().equals(userId))
                .toList();
-       if(usersItems.isEmpty())
+       if (usersItems.isEmpty())
            throw new NotFoundException("У пользователя с id - " + userId + " нет вещей во владении");
        return usersItems;
     }
 
     @Override
     public Collection<Item> searchItemsByNameAndDescription(String text, Long userId) {
+
+        String lowText = text.toLowerCase();
         Collection<Item> usersItems = items.values().stream()
                 .filter(item -> item.getAvailable().equals(true)
-                        && (item.getDescription().contains(text) || item.getName().contains(text))
+                        && (item.getDescription().toLowerCase().contains(lowText)
+                        || item.getName().toLowerCase().contains(lowText))
                 )
                 .toList();
         if (usersItems.isEmpty())
-            throw new NotFoundException("Нет доступных вещей с таким описанием: " + text);
+            return new ArrayList<>();
         return usersItems;
     }
 
@@ -48,6 +53,22 @@ public class ItemStorageMemory implements ItemStorage {
         item.setId(getId());
         items.put(item.getId(), item);
         return item;
+    }
+
+    @Override
+    public Item updateItem(Item item) {
+       Item updatedItem = items.get(item.getId());
+       return ItemMapper.updateItemFields(item, updatedItem);
+    }
+
+    @Override
+    public boolean isItemOwnerByUserId(Long userId, Long itemId) {
+        checkItem(itemId);
+        if (items.containsKey(itemId)) {
+           Item item = items.get(itemId);
+           return item.getOwnerId().equals(userId);
+        }
+        return false;
     }
 
 
@@ -61,6 +82,7 @@ public class ItemStorageMemory implements ItemStorage {
             throw new NotFoundException("Вещь с ID - " + itemId + " не найдена");
         }
     }
+
     private long getId() {
         long lastId = items.keySet().stream()
                 .max(Long::compare)

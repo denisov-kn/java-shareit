@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
+import ru.practicum.shareit.item.dto.UpdateItemRequest;
 
 import java.util.Collection;
 
@@ -40,10 +41,21 @@ public class ItemController {
         return itemService.searchItems(text, userId);
     }
 
-    @PostMapping("{itemId}")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId,
                               @Validated @RequestBody NewItemRequest request) {
         return itemService.createItem(userId, request);
     }
+
+    @PatchMapping("{itemId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ItemDto updateItem(@PathVariable long itemId,
+                              @RequestHeader("X-Sharer-User-Id") long userId,
+                              @Validated @RequestBody UpdateItemRequest request) {
+        return itemService.updateItem(userId, itemId, request);
+    }
+
+
+
 }

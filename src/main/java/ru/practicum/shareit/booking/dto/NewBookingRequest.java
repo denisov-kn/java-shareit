@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import ru.practicum.shareit.constants.Status;
 import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDate;
