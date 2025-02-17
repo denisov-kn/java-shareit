@@ -8,9 +8,7 @@ import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 
-/**
- * TODO Sprint add-controllers.
- */
+
 @Validated
 @RestController
 @RequestMapping(path = "/users")
