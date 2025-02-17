@@ -16,14 +16,6 @@ public class ItemStorageMemory implements ItemStorage {
     public final Map<Long, Item> items = new HashMap<Long, Item>();
 
     @Override
-    public Item getItemByUserIdAndItemId(Long itemId, Long userId) {
-        Item item =  getItemById(itemId);
-        if (item.getOwnerId().equals(userId))
-            return item;
-        else throw new NotFoundException("Вещь с ID - " + itemId + " не принадлежит пользователю с ID - " + userId);
-    }
-
-    @Override
     public Collection<Item> getAllItemsByUserId(Long userId) {
        Collection<Item> usersItems =  items.values().stream()
                .filter(item -> item.getOwnerId().equals(userId))
@@ -38,7 +30,7 @@ public class ItemStorageMemory implements ItemStorage {
 
         String lowText = text.toLowerCase();
         Collection<Item> usersItems = items.values().stream()
-                .filter(item -> item.getAvailable().equals(true)
+                .filter(item -> item.getAvailable()
                         && (item.getDescription().toLowerCase().contains(lowText)
                         || item.getName().toLowerCase().contains(lowText))
                 )
@@ -71,7 +63,7 @@ public class ItemStorageMemory implements ItemStorage {
         return false;
     }
 
-
+    @Override
     public Item getItemById(Long itemId) {
         checkItem(itemId);
         return items.get(itemId);

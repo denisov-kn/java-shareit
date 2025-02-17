@@ -20,8 +20,9 @@ public class ItemService {
     public final ItemStorage itemStorage;
     public final UserStorage userStorage;
 
-    public ItemDto getItemByUserIdAndItemId(Long itemId, Long userId) {
-        return ItemMapper.mapToItemDto(itemStorage.getItemByUserIdAndItemId(itemId, userId));
+    public ItemDto getItemById(Long itemId, Long userId) {
+        userStorage.checkUser(userId);
+        return ItemMapper.mapToItemDto(itemStorage.getItemById(itemId));
     }
 
     public Collection<ItemDto> getAllItemsByUserId(Long userId) {
