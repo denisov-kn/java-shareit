@@ -11,14 +11,4 @@ public class UserMapper {
         userDto.setEmail(user.getEmail());
         return userDto;
     }
-
-    public static User updateUserFields(User newUser, User updateUser) {
-        if (newUser.getEmail() != null) {
-            updateUser.setEmail(newUser.getEmail());
-        }
-        if (newUser.getName() != null) {
-            updateUser.setName(newUser.getName());
-        }
-        return updateUser;
-    }
 }

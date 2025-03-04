@@ -7,8 +7,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,13 +21,15 @@ public class ItemService {
     public final UserStorage userStorage;
 
     public ItemDto getItemById(Long itemId, Long userId) {
-        userStorage.checkUser(userId);
-        return ItemMapper.mapToItemDto(itemStorage.getItemById(itemId));
+        checkUser(userId);
+        return ItemMapper.mapToItemDto(itemStorage.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item not found"))
+        );
     }
 
     public Collection<ItemDto> getAllItemsByUserId(Long userId) {
-        userStorage.checkUser(userId);
-        return itemStorage.getAllItemsByUserId(userId).stream()
+        checkUser(userId);
+        return itemStorage.getAllItemsByOwnerId(userId).stream()
                 .map(ItemMapper::mapToItemDto)
                 .collect(Collectors.toList());
     }
@@ -35,33 +37,44 @@ public class ItemService {
     public Collection<ItemDto> searchItems(String text, Long userId) {
         if (text.isEmpty())
             return new ArrayList<>();
-        userStorage.checkUser(userId);
-        return itemStorage.searchItemsByNameAndDescription(text, userId).stream()
+        checkUser(userId);
+        return itemStorage.searchItemsByNameAndDescription(text).stream()
                 .map(ItemMapper::mapToItemDto)
                 .collect(Collectors.toList());
     }
 
     public ItemDto createItem(Long userId, NewItemRequest request) {
-        userStorage.checkUser(userId);
-        Item item = ItemMapper.mapToItem(request);
-        item.setOwnerId(userId);
-        item = itemStorage.saveItem(item);
+        User user = userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        Item item = ItemMapper.mapToItem(request, user);
+        item = itemStorage.save(item);
         return ItemMapper.mapToItemDto(item);
     }
 
     public ItemDto updateItem(Long userId, Long itemId,  UpdateItemRequest request) {
-        userStorage.checkUser(userId);
-        if (!itemStorage.isItemOwnerByUserId(userId, itemId))
+        checkUser(userId);
+        if (!itemStorage.existsByIdAndOwnerId(itemId, userId))
             throw new NotFoundException("Вещь с ID: " + itemId + " не принадлежит пользователю с ID: " + userId);
 
-        Item item = new Item();
-        item.setId(itemId);
-        item.setAvailable(request.getAvailable());
-        item.setDescription(request.getDescription());
-        item.setName(request.getName());
+        Item item = itemStorage.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item not found"));
 
-        item = itemStorage.updateItem(item);
+        if (request.getName() != null) {
+            item.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            item.setDescription(request.getDescription());
+        }
+        if (request.getAvailable() != null) {
+            item.setAvailable(request.getAvailable());
+        }
+        item = itemStorage.save(item);
         return ItemMapper.mapToItemDto(item);
+    }
+
+    private void checkUser(Long userId) {
+        userStorage.findById(userId).
+                orElseThrow(() -> new NotFoundException("User not found"));
     }
 
 }

@@ -53,6 +53,4 @@ public class ItemController {
         return itemService.updateItem(userId, itemId, request);
     }
 
-
-
 }
