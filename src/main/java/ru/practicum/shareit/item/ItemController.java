@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.NewItemRequest;
-import ru.practicum.shareit.item.dto.UpdateItemRequest;
+import ru.practicum.shareit.item.comments.CommentDto;
+import ru.practicum.shareit.item.comments.NewCommentRequest;
+import ru.practicum.shareit.item.dto.*;
 
 import java.util.Collection;
 
@@ -20,14 +20,14 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemDto getItemById(@PathVariable long itemId,
-                                   @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemCommentDateDto getItemById(@PathVariable long itemId,
+                                      @RequestHeader("X-Sharer-User-Id") long userId) {
        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemCommentDateDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAllItemsByUserId(userId);
     }
 
@@ -51,6 +51,14 @@ public class ItemController {
                               @RequestHeader("X-Sharer-User-Id") long userId,
                               @Validated @RequestBody UpdateItemRequest request) {
         return itemService.updateItem(userId, itemId, request);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto createComment(@PathVariable long itemId,
+                                    @RequestHeader("X-Sharer-User-Id") long userId,
+                                    @Validated @RequestBody NewCommentRequest request) {
+        return itemService.createComment(itemId, userId, request);
     }
 
 
