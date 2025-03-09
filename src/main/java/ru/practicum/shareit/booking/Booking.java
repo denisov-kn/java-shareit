@@ -1,18 +1,21 @@
 package ru.practicum.shareit.booking;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.constants.Status;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.user.User;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "bookings", schema = "public")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +35,7 @@ public class Booking {
     @JoinColumn (name = "booker_id")
     private User booker;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status;
 }

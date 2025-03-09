@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -7,7 +8,6 @@ import ru.practicum.shareit.exceptions.SameEmailException;
 import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
@@ -34,11 +34,12 @@ public class UserService {
         return UserMapper.mapToUserDto(userStorage.save(user));
     }
 
+    @Transactional
     public UserDto updateUser(Long userId, UpdateUserRequest request) {
 
         checkEmail(request.getEmail());
-        User user = userStorage.findById(userId).
-                orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());

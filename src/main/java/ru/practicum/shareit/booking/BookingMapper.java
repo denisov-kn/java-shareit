@@ -2,10 +2,12 @@ package ru.practicum.shareit.booking;
 
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.dto.NewBookingRequest;
 import ru.practicum.shareit.constants.Status;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 @NoArgsConstructor
 public class BookingMapper {
@@ -19,7 +21,7 @@ public class BookingMapper {
         return booking;
     }
 
-    public static BookingDto mapToBookingDto(Booking booking, User user) {
+    public static BookingDto mapToBookingDto(Booking booking, UserDto user) {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItem(booking.getItem());
         bookingDto.setStart(booking.getStartDate());
@@ -28,6 +30,14 @@ public class BookingMapper {
         bookingDto.setStatus(booking.getStatus());
         bookingDto.setBooker(user);
         return bookingDto;
+    }
+
+    public static BookingInfoDto mapToBookingInfoDto(Booking booking) {
+        BookingInfoDto bookingInfoDto = new BookingInfoDto();
+        bookingInfoDto.setId(booking.getId());
+        bookingInfoDto.setStart(booking.getStartDate());
+        bookingInfoDto.setEnd(booking.getEndDate());
+        return bookingInfoDto;
     }
 
 }
