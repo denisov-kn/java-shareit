@@ -41,8 +41,6 @@ public class BookingService {
     public BookingDto setApprove(Long bookingId, Long ownerId, Boolean approve) {
         Booking booking = bookingStorage.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
-        User owner = userStorage.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
         if (!booking.getItem().getOwner().getId().equals(ownerId))
              throw new ForbiddenException("Пользователь не является владельцем бронирования");
         if (approve) {
