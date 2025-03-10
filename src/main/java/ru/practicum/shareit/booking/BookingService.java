@@ -53,13 +53,8 @@ public class BookingService {
 
     public BookingDto createBooking(NewBookingRequest newBookingRequest, Long userId) {
 
-        User booker = checkUser(userId);
-        Item item = itemStorage.findById(newBookingRequest.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item  c id " + newBookingRequest.getItemId() + " не найден"));
-
         LocalDateTime endDate = newBookingRequest.getEnd();
         LocalDateTime startDate = newBookingRequest.getStart();
-
 
         if (endDate.isEqual(startDate) || endDate.isBefore(startDate)) {
             throw new BadRequestException("Время начала бронирования (" +
@@ -67,6 +62,11 @@ public class BookingService {
                     + "не может быть равным или больше времени окончания ("
                     + newBookingRequest.getEnd() + ")");
         }
+
+
+        User booker = checkUser(userId);
+        Item item = itemStorage.findById(newBookingRequest.getItemId())
+                .orElseThrow(() -> new NotFoundException("Item  c id " + newBookingRequest.getItemId() + " не найден"));
 
         if (!item.getAvailable())
             throw new BadRequestException("Item " + item.getId() + " недоступен для бронирования");
