@@ -16,6 +16,7 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -27,20 +28,19 @@ public class BookingService {
     private final ItemStorage itemStorage;
 
     public BookingDto findBookingById(Long bookingId, Long userId) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        Booking booking = bookingStorage.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        User user = checkUser(userId);
+        Booking booking = checkBooking(bookingId);
         if (booking.getBooker().getId().equals(userId) ||
                 booking.getItem().getOwner().getId().equals(userId)) {
             return BookingMapper.mapToBookingDto(booking,  UserMapper.mapToUserDto(user));
         } else throw new ForbiddenException("У пользователя нет доступа к бронированию");
     }
 
+
+
     @Transactional
     public BookingDto setApprove(Long bookingId, Long ownerId, Boolean approve) {
-        Booking booking = bookingStorage.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        Booking booking = checkBooking(bookingId);
         if (!booking.getItem().getOwner().getId().equals(ownerId))
              throw new ForbiddenException("Пользователь не является владельцем бронирования");
         if (approve) {
@@ -53,31 +53,25 @@ public class BookingService {
 
     public BookingDto createBooking(NewBookingRequest newBookingRequest, Long userId) {
 
-        User booker = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User booker = checkUser(userId);
         Item item = itemStorage.findById(newBookingRequest.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item not found"));
+                .orElseThrow(() -> new NotFoundException("Item  c id " + newBookingRequest.getItemId() + " не найден"));
 
-        if (newBookingRequest.getEnd().isEqual(newBookingRequest.getStart()))
+        LocalDateTime endDate = newBookingRequest.getEnd();
+        LocalDateTime startDate = newBookingRequest.getStart();
+
+
+        if (endDate.isEqual(startDate) || endDate.isBefore(startDate)) {
             throw new BadRequestException("Время начала бронирования (" +
                     newBookingRequest.getStart() + ") "
-                    + "не может быть равным времени окончания ("
+                    + "не может быть равным или больше времени окончания ("
                     + newBookingRequest.getEnd() + ")");
-        if (newBookingRequest.getEnd().isBefore(newBookingRequest.getStart()))
-            throw new BadRequestException("Время начала бронирования (" +
-                    newBookingRequest.getStart() + ") "
-                    + "не может быть позже времени окончания ("
-                    + newBookingRequest.getEnd() + ")");
+        }
 
         if (!item.getAvailable())
             throw new BadRequestException("Item " + item.getId() + " недоступен для бронирования");
 
-        Booking booking = new Booking();
-        booking.setStatus(Status.WAITING);
-        booking.setItem(item);
-        booking.setBooker(booker);
-        booking.setStartDate(newBookingRequest.getStart());
-        booking.setEndDate(newBookingRequest.getEnd());
+        Booking booking = BookingMapper.mapToBooking(newBookingRequest, booker, item);
         booking = bookingStorage.save(booking);
 
         return  BookingMapper.mapToBookingDto(booking, UserMapper.mapToUserDto(booker));
@@ -85,7 +79,7 @@ public class BookingService {
 
     public Collection<BookingDto> findAllBookingsByUserIdAndState(Long userId, String state) {
 
-        userStorage.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        checkUser(userId);
         if (state.equals("ALL"))
             return bookingStorage.findBookingsByBookerId(userId).stream()
                     .map(booking -> BookingMapper.mapToBookingDto(
@@ -107,7 +101,7 @@ public class BookingService {
 
     public Collection<BookingDto> findAllBookingsByOwnerIdAndState(Long ownerId, String state) {
 
-        userStorage.findById(ownerId).orElseThrow(() -> new NotFoundException("User not found"));
+        checkUser(ownerId);
         if (state.equals("ALL"))
             return bookingStorage.findBookingsByItem_Owner_Id(ownerId).stream()
                     .map(booking -> BookingMapper.mapToBookingDto(
@@ -124,5 +118,15 @@ public class BookingService {
                    )
                    .collect(Collectors.toList());
         }
+    }
+
+    private Booking checkBooking(Long bookingId) {
+        return bookingStorage.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking с id: " + bookingId + " не найден"));
+    }
+
+    private User checkUser(Long userId) {
+        return  userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User с id: " + userId + " не найден"));
     }
 }

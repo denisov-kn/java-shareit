@@ -39,7 +39,7 @@ public class UserService {
 
         checkEmail(request.getEmail());
         User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User c id " + userId + " не найден"));
 
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());

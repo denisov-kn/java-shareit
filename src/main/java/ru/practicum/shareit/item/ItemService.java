@@ -40,9 +40,7 @@ public class ItemService {
                 .map(CommentMapper::toDto)
                 .toList();
 
-        Item item = itemStorage.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item not found"));
-
+        Item item = checkItem(itemId);
 
         Booking lastBooking = null;
         Booking nextBooking = null;
@@ -52,17 +50,16 @@ public class ItemService {
             nextBooking = bookingStorage.findNextBookingByItemId(itemId);
         }
 
-
         BookingInfoDto lastBookingDto = (lastBooking != null) ? BookingMapper.mapToBookingInfoDto(lastBooking) : null;
         BookingInfoDto nextBookingDto = (nextBooking != null) ? BookingMapper.mapToBookingInfoDto(nextBooking) : null;
-
 
         return ItemMapper.mapToItemCommentDateDto(item, commentsDto, nextBookingDto, lastBookingDto);
     }
 
+
+
     public Collection<ItemCommentDateDto> getAllItemsByUserId(Long userId) {
         checkUser(userId);
-
         Collection<Item> items = itemStorage.getAllItemsByOwnerId(userId);
 
         if (items.isEmpty()) {
@@ -116,8 +113,7 @@ public class ItemService {
     }
 
     public ItemDto createItem(Long userId, NewItemRequest request) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = checkUser(userId);
         Item item = ItemMapper.mapToItem(request, user);
         item = itemStorage.save(item);
         return ItemMapper.mapToItemDto(item);
@@ -127,10 +123,9 @@ public class ItemService {
     public ItemDto updateItem(Long userId, Long itemId, UpdateItemRequest request) {
         checkUser(userId);
         if (!itemStorage.existsByIdAndOwnerId(itemId, userId))
-            throw new NotFoundException("Вещь с ID: " + itemId + " не принадлежит пользователю с ID: " + userId);
+            throw new NotFoundException("Вещь с Id: " + itemId + " не принадлежит пользователю с Id: " + userId);
 
-        Item item = itemStorage.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item not found"));
+        Item item = checkItem(itemId);
 
         if (request.getName() != null) {
             item.setName(request.getName());
@@ -145,18 +140,10 @@ public class ItemService {
         return ItemMapper.mapToItemDto(item);
     }
 
-    private void checkUser(Long userId) {
-        userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-    }
-
     public CommentDto createComment(Long itemId, Long userId, NewCommentRequest request) {
 
-        User booker = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        itemStorage.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item not found"));
-
+        User booker = checkUser(userId);
+        checkItem(itemId);
         Booking booking = bookingStorage.findBookingsByBookerIdAndStatus(userId, Status.APPROVED).stream()
                 .findFirst().orElseThrow(() -> new NotFoundException("Booking not found"));
 
@@ -171,6 +158,16 @@ public class ItemService {
 
         commentStorage.save(comment);
         return CommentMapper.toDto(comment);
+    }
+
+    private User checkUser(Long userId) {
+        return  userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User с id: " + userId + " не найден"));
+    }
+
+    private Item checkItem(Long itemId) {
+        return itemStorage.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item с id: " + itemId + " не найден"));
     }
 
 }
