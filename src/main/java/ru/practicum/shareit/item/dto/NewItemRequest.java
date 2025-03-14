@@ -13,4 +13,5 @@ public class NewItemRequest {
     private String description;
     @NotNull(message = "Доступность не может отсутствовать")
     private Boolean available;
+    private Long requestId;
 }

@@ -54,15 +54,15 @@ public class ErrorHandlingControllerAdvice {
     public ValidationErrorResponse onConstraintValidationException(
             ConstraintViolationException e
     ) {
-        final List<Violation> violations = e.getConstraintViolations().stream()
+        final List<Error> errors = e.getConstraintViolations().stream()
                 .map(
-                        violation -> new Violation(
+                        violation -> new Error(
                                 violation.getPropertyPath().toString(),
                                 violation.getMessage()
                         )
                 )
                 .collect(Collectors.toList());
-        return new ValidationErrorResponse(violations);
+        return new ValidationErrorResponse(errors);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -71,10 +71,10 @@ public class ErrorHandlingControllerAdvice {
     public ValidationErrorResponse onMethodArgumentNotValidException(
             MethodArgumentNotValidException e
     ) {
-        final List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
+        final List<Error> errors = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> new Error(error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.toList());
-        return new ValidationErrorResponse(violations);
+        return new ValidationErrorResponse(errors);
     }
 
     @ExceptionHandler(BadRequestException.class)

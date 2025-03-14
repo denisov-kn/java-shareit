@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 
@@ -29,4 +30,8 @@ public class Item {
     @ManyToOne (fetch = FetchType.EAGER)
     @JoinColumn (name = "owner_id")
     private User owner;
+
+    @ManyToOne (fetch = FetchType.EAGER)
+    @JoinColumn (name = "request_id")
+    private ItemRequest itemRequest;
 }

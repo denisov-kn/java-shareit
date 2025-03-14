@@ -20,5 +20,6 @@ public interface ItemStorage extends JpaRepository<Item, Long> {
 
     boolean existsByIdAndOwnerId(Long id, Long userId);
 
+    Collection<Item> searchItemsByItemRequest_Id(Long id);
 
 }

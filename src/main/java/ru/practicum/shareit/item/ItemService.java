@@ -16,6 +16,8 @@ import ru.practicum.shareit.item.dto.ItemCommentDateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestStorage;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
@@ -31,6 +33,7 @@ public class ItemService {
     public final UserStorage userStorage;
     public final CommentStorage commentStorage;
     public final BookingStorage bookingStorage;
+    public final ItemRequestStorage itemRequestStorage;
 
     public ItemCommentDateDto getItemById(Long itemId, Long userId) {
 
@@ -114,7 +117,13 @@ public class ItemService {
 
     public ItemDto createItem(Long userId, NewItemRequest request) {
         User user = checkUser(userId);
-        Item item = ItemMapper.mapToItem(request, user);
+        ItemRequest itemRequest = null;
+
+        if(request.getRequestId() != null) {
+            itemRequest = itemRequestStorage.findById(request.getRequestId()).orElse(null);
+        }
+
+        Item item = ItemMapper.mapToItem(request, user, itemRequest);
         item = itemStorage.save(item);
         return ItemMapper.mapToItemDto(item);
     }

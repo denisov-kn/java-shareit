@@ -7,17 +7,20 @@ import ru.practicum.shareit.item.dto.ItemCommentDateDto;
 import ru.practicum.shareit.item.dto.ItemCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 import java.util.Collection;
 
 @NoArgsConstructor
 public class ItemMapper {
-    public static Item mapToItem(NewItemRequest request, User user) {
+    public static Item mapToItem(NewItemRequest request, User user, ItemRequest itemRequest) {
         Item item = new Item();
         item.setAvailable(request.getAvailable());
         item.setName(request.getName());
         item.setDescription(request.getDescription());
         item.setOwner(user);
+        item.setItemRequest(itemRequest);
+        item.setItemRequest(itemRequest);
         return item;
     }
 
