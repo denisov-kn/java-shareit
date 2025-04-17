@@ -19,6 +19,8 @@ insert into items (item_name, description, is_available, owner_id)
     VALUES ('Вещь3', 'Описание вещь3', false, 3);
 insert into items (item_name, description, is_available, owner_id)
     VALUES ('Вещь4', 'Описание вещь4', false, 5);
+insert into items (item_name, description, is_available, owner_id)
+VALUES ('Вещь5', 'Описание вещь4', false, 2);
 
 
 
@@ -36,6 +38,9 @@ VALUES ('2025-04-10T10:30:00', '2025-04-12T10:30:00', 4, 6, 'APPROVED');
 
 insert into bookings (start_date, end_date, item_id, booker_id, status)
 VALUES ('2025-04-10T10:30:00', '2025-04-12T10:30:00', 4, 6, 'WAITING');
+
+insert into bookings (start_date, end_date, item_id, booker_id, status)
+VALUES ( '2099-04-10T10:30:00', '2099-04-12T10:30:00', 5, 6, 'APPROVED');
 
 
 

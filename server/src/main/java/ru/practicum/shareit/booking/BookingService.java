@@ -32,7 +32,7 @@ public class BookingService {
         Booking booking = checkBooking(bookingId);
         if (booking.getBooker().getId().equals(userId) ||
                 booking.getItem().getOwner().getId().equals(userId)) {
-            return BookingMapper.mapToBookingDto(booking,  UserMapper.mapToUserDto(user));
+            return BookingMapper.mapToBookingDto(booking,  UserMapper.mapToUserDto(booking.getBooker()));
         } else throw new ForbiddenException("У пользователя нет доступа к бронированию");
     }
 

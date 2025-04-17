@@ -15,6 +15,8 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     Collection<Booking> findBookingsByBookerIdAndStatus(Long bookerId, Status status);
 
+    Collection<Booking> findBookingsByBookerIdAndStatusAndItemId(Long bookerId, Status status, Long itemId);
+
     Collection<Booking> findBookingsByBookerId(Long bookerId);
 
     Collection<Booking> findBookingsByItem_Owner_Id(Long itemOwnerId);

@@ -153,7 +153,7 @@ public class ItemService {
 
         User booker = checkUser(userId);
         checkItem(itemId);
-        Booking booking = bookingStorage.findBookingsByBookerIdAndStatus(userId, Status.APPROVED).stream()
+        Booking booking = bookingStorage.findBookingsByBookerIdAndStatusAndItemId(userId, Status.APPROVED, itemId).stream()
                 .findFirst().orElseThrow(() -> new NotFoundException("Booking not found"));
 
         if (booking.getEndDate().isAfter(LocalDateTime.now()))

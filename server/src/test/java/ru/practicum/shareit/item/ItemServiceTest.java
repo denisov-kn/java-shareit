@@ -12,6 +12,7 @@ import ru.practicum.shareit.TestData;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
+import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.comments.Comment;
 import ru.practicum.shareit.item.comments.CommentDto;
@@ -105,6 +106,23 @@ class ItemServiceTest {
         Item itemFromDB = queryItem.getSingleResult();
         return itemFromDB;
     }
+
+    @Test
+    @DisplayName("Не передавать вещь если id пользователя не существует  - getItemById")
+    void shouldNotGetItemByIdIfIdUserNotFound() {
+        Long itemId = 1L;
+        Long ownerId = 99L;
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(itemId, ownerId));
+    }
+
+    @Test
+    @DisplayName("Не передавать вещь если id  вещи не существует  - getItemById")
+    void shouldNotGetItemByIdIfIdItemNotFound() {
+        Long itemId = 99L;
+        Long ownerId = 3L;
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(itemId, ownerId));
+    }
+
 
     @Test
     @DisplayName("Получить все вещи пользователя по id - getAllItemsByUserId")
@@ -336,4 +354,46 @@ WHERE b.item.owner.id = :ownerId
         assertEquals(commentDto, commentDtoFromDB, "Комментарий созданный с сервиса и в БД должны совпадать");
 
     }
+
+
+    @Test
+    @DisplayName("Должен создать вещь по запросу - createItem")
+    void shouldCreateItemWithRequest() {
+
+        Long ownerId = 4L;
+
+        NewItemRequest newItemRequest = new NewItemRequest();
+        newItemRequest.setAvailable(false);
+        newItemRequest.setName("Вещь10");
+        newItemRequest.setDescription("Описание Вещь10");
+        newItemRequest.setRequestId(1L);
+        ItemDto itemDto = itemService.createItem(ownerId, newItemRequest);
+
+        Item itemFromDB = getItemFromDB(itemDto.getId(), ownerId);
+        ItemDto itemDtoFromDB = ItemMapper.mapToItemDto(itemFromDB);
+
+        assertEquals(itemDto, itemDtoFromDB, "Вещь созданная через сервис должна находиться в БД");
+    }
+
+    @Test
+    @DisplayName("Не должен создать комментарий пока не закончилось бронирование - createComment")
+    void shouldNotCreateCommentByTime() {
+        Long bookerId = 6L;
+        Long itemId = 5L;
+        NewCommentRequest newCommentRequest = new NewCommentRequest();
+        newCommentRequest.setText("Комментарий");
+        assertThrows(BadRequestException.class, () -> itemService.createComment(itemId, bookerId, newCommentRequest));
+    }
+
+    @Test
+    @DisplayName("Должен выдавать пустой массив если у пользователя нет вещей - getAllItemsByUserId")
+    void shouldGetEmptyListIfUserHaveNotItems() {
+        Long ownerId = 4L;
+        List<ItemCommentDateDto> itemCommentDateDto = itemService.getAllItemsByUserId(ownerId);
+        System.out.println(itemCommentDateDto);
+        assertTrue(itemCommentDateDto.isEmpty(), "Должен выдавать пустой массив если у пользователя нет вещей");
+    }
+
 }
+
+

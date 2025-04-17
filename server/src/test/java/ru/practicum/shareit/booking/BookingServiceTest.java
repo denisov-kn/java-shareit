@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.dto.NewBookingRequest;
 import ru.practicum.shareit.constants.Status;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.ForbiddenException;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -30,7 +31,7 @@ class BookingServiceTest {
     private final EntityManager em;
 
     @Test
-    @DisplayName("Получить бронирование по id - findBookingById")
+    @DisplayName("Получить бронирование по id букера - findBookingById")
     void findBookingById() {
         Long bookingId = 1L;
         Long bookerId = 2L;
@@ -42,6 +43,48 @@ class BookingServiceTest {
                 "Бронирование найденное в базе и через сервис должны совпадать");
 
     }
+
+    @Test
+    @DisplayName("Получить бронирование по id владельца - findBookingById")
+    void findBookingByIdWithOwnerId() {
+        Long bookingId = 1L;
+        Long  ownerId = 3L;
+        BookingDto bookingDto = bookingService.findBookingById(bookingId, ownerId);
+
+        BookingDto bookingDtoFromDB = getBookingDtoFromDB(bookingId);
+
+        assertEquals(bookingDto, bookingDtoFromDB,
+                "Бронирование найденное в базе и через сервис должны совпадать");
+
+    }
+
+    @Test
+    @DisplayName("Не должен находить бронирование если пользователь не владелец или не создавал бронирование - findBookingById")
+    void shouldNotFindBookingByIdIfUserIdIsNotOwnerOrBooker() {
+        Long bookingId = 1L;
+        Long  userId = 5L;
+        assertThrows(ForbiddenException.class, () -> bookingService.findBookingById(bookingId, userId));
+    }
+
+    @Test
+    @DisplayName("Не должен получить бронирование если пользователь не найден - findBookingById")
+    void shouldNotFindBookingByIdIfIdUserIsWrong() {
+        Long bookingId = 1L;
+        Long bookerId = 99L;
+        assertThrows(NotFoundException.class, () -> bookingService.findBookingById(bookingId, bookerId));
+
+    }
+
+    @Test
+    @DisplayName("Не должен получить бронирование если бронирование не найдено - findBookingById")
+    void shouldNotFindBookingByIdIfIdBookingIsWrong() {
+        Long bookingId = 99L;
+        Long bookerId = 2L;
+        assertThrows(NotFoundException.class, () -> bookingService.findBookingById(bookingId, bookerId));
+
+    }
+
+
 
     private BookingDto getBookingDtoFromDB(Long bookingId) {
         TypedQuery<Booking> query = em.createQuery("select b from Booking b where b.id = :bookingId", Booking.class);
@@ -62,7 +105,18 @@ class BookingServiceTest {
 
         assertEquals(Status.APPROVED,getBookingDtoFromDB(bookingId).getStatus(),
                 "Сервис должен поменять в БД статус бронирования на APPROVED");
+    }
 
+    @Test
+    @DisplayName("Отклонить бронирование - setApprove")
+    void setApproveRejected() {
+        Long bookingId = 4L;
+        Long ownerId = 5L;
+
+        bookingService.setApprove(bookingId, ownerId, false);
+
+        assertEquals(Status.REJECTED,getBookingDtoFromDB(bookingId).getStatus(),
+                "Сервис должен поменять в БД статус бронирования на REJECTED");
     }
 
     @Test
@@ -84,6 +138,37 @@ class BookingServiceTest {
         assertEquals(bookingDto, bookingDtoFromDb,
                 "Сервис должен создавать бронирование и такое бронирование должно быть в БД");
 
+    }
+
+
+    @Test
+    @DisplayName("Не должен создавать бронирование если вещь недоступна - createBooking")
+    void shouldNotCreateBookingIfItemNotAvailable() {
+
+        Long itemId = 3L;
+        Long bookerId = 6L;
+
+        NewBookingRequest newBookingRequest = new NewBookingRequest();
+        newBookingRequest.setStart(LocalDateTime.now().plusDays(1));
+        newBookingRequest.setEnd(LocalDateTime.now().plusDays(5));
+        newBookingRequest.setItemId(itemId);
+
+        assertThrows(BadRequestException.class, () -> bookingService.createBooking(newBookingRequest, bookerId));
+    }
+
+    @Test
+    @DisplayName("Не должен создавать бронирование если вещь не найдена- createBooking")
+    void shouldNotCreateBookingIfItemNotFound() {
+
+        Long itemId = 10L;
+        Long bookerId = 6L;
+
+        NewBookingRequest newBookingRequest = new NewBookingRequest();
+        newBookingRequest.setStart(LocalDateTime.now().plusDays(1));
+        newBookingRequest.setEnd(LocalDateTime.now().plusDays(5));
+        newBookingRequest.setItemId(itemId);
+
+        assertThrows(NotFoundException.class, () -> bookingService.createBooking(newBookingRequest, bookerId));
     }
 
     @Test
