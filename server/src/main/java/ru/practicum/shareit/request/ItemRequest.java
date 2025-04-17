@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 
 @Data
-public class ItemRequest{
+public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

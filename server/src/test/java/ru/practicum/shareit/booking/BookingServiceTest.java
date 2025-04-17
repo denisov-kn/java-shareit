@@ -213,7 +213,7 @@ class BookingServiceTest {
         newBookingRequest.setEnd(LocalDateTime.now().plusDays(1));
         newBookingRequest.setItemId(itemId);
 
-        assertThrows(BadRequestException.class, ()-> bookingService.createBooking(newBookingRequest, bookerId));
+        assertThrows(BadRequestException.class, () -> bookingService.createBooking(newBookingRequest, bookerId));
     }
 
     @Test
@@ -222,7 +222,7 @@ class BookingServiceTest {
         Long bookingId = 4L;
         Long ownerId = 4L;
 
-        assertThrows(ForbiddenException.class, ()-> bookingService.setApprove(bookingId, ownerId, true));
+        assertThrows(ForbiddenException.class, () -> bookingService.setApprove(bookingId, ownerId, true));
 
     }
 

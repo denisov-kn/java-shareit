@@ -22,9 +22,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -76,8 +74,7 @@ class ItemServiceTest {
 
         TypedQuery<Booking> queryLast = em
                 .createQuery("select b from Booking b WHERE b.item.id = :itemId AND b.endDate < :currentDate" +
-                " ORDER BY b.endDate DESC "
-                , Booking.class
+                " ORDER BY b.endDate DESC ", Booking.class
         );
         queryLast.setParameter("itemId", itemId);
         queryLast.setParameter("currentDate", LocalDateTime.now());
@@ -150,8 +147,7 @@ WHERE b.item.owner.id = :ownerId
         AND b2.startDate > CURRENT_TIMESTAMP))
     )
     ORDER BY b.item.id, b.endDate DESC, b.startDate ASC
-"""
-                        , Booking.class
+""", Booking.class
                 );
        queryBooking.setParameter("ownerId", ownerId);
        List<Booking> resultsBooking = queryBooking.getResultList();
@@ -162,7 +158,7 @@ WHERE b.item.owner.id = :ownerId
 
 
         List<ItemCommentDateDto> itemCommentDateDtoFromDB = itemFromDB.stream()
-                .map( item -> {
+                .map(item -> {
                     List<Booking> bookingsItem = lastAndNextBookings.getOrDefault(item.getId(), Collections.emptyList());
 
                     BookingInfoDto lastBooking = !bookingsItem.isEmpty()
@@ -201,8 +197,7 @@ WHERE b.item.owner.id = :ownerId
                     where (lower(i.name) like lower(:text)
                     OR lower(i.description) like lower(:text))
                     and i.available = true
-                    """
-                , Item.class
+                    """, Item.class
         );
         query.setParameter("text", "%" + text + "%");
         List<Item> itemsFromDB = query.getResultList();

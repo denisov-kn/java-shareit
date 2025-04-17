@@ -8,7 +8,6 @@ import ru.practicum.shareit.request.dto.NewItemRequestDto;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @NoArgsConstructor

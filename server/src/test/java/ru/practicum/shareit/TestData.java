@@ -3,7 +3,6 @@ package ru.practicum.shareit;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.constants.Status;
-import ru.practicum.shareit.item.comments.Comment;
 import ru.practicum.shareit.item.comments.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCommentDateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -301,7 +300,7 @@ public class TestData {
             .build();
 
     private static final Map<Long, ItemRequestItemsDto> itemRequestItemsDtoList = Map.of(
-            itemRequestItemsDto1 .getId(), itemRequestItemsDto1
+            itemRequestItemsDto1.getId(), itemRequestItemsDto1
     );
 
     public static ItemRequestItemsDto getItemRequestItemsDto(Long id) {

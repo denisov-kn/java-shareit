@@ -119,7 +119,7 @@ public class ItemService {
         User user = checkUser(userId);
         ItemRequest itemRequest = null;
 
-        if(request.getRequestId() != null) {
+        if (request.getRequestId() != null) {
             itemRequest = itemRequestStorage.findById(request.getRequestId()).orElse(null);
         }
 

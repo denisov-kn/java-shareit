@@ -84,7 +84,7 @@ class BookingControllerTest {
         newBookingRequest.setStart(LocalDateTime.now().plusDays(2));
 
         BookingDto bookingDto = TestData.getBookingDto(bookingId);
-        when(bookingService.createBooking(newBookingRequest,userId )).thenReturn(bookingDto);
+        when(bookingService.createBooking(newBookingRequest,userId)).thenReturn(bookingDto);
         mockMvc.perform(
                 post("/bookings")
                         .header("X-Sharer-User-Id", userId)
@@ -96,7 +96,8 @@ class BookingControllerTest {
         verify(bookingService, times(1)).createBooking(newBookingRequest,userId);
     }
 
-    @Test @DisplayName("Получить все бронирования для пользователя ")
+    @Test
+    @DisplayName("Получить все бронирования для пользователя ")
     void getBookingByUserIdAndState() throws Exception {
 
         long userId = 1L;

@@ -65,7 +65,7 @@ class ItemControllerTest {
 
         List<ItemCommentDateDto> itemCommentDateDtoList = TestData.getAllItemCommentDateDto();
 
-        when(itemService.getAllItemsByUserId( userId)).thenReturn(itemCommentDateDtoList);
+        when(itemService.getAllItemsByUserId(userId)).thenReturn(itemCommentDateDtoList);
         mockMvc.perform(
                         get("/items")
                                 .header("X-Sharer-User-Id", userId))

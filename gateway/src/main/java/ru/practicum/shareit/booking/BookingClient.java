@@ -36,7 +36,7 @@ public class BookingClient extends BaseClient {
         return post("", userId, request);
     }
 
-    public ResponseEntity<Object> setApprove(long ownerId, long bookingId, boolean approved ) {
+    public ResponseEntity<Object> setApprove(long ownerId, long bookingId, boolean approved) {
         Map<String, Object> parameters = Map.of(
                 "approved", approved
         );
