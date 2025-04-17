@@ -33,16 +33,6 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemCommentDto mapToItemCommentDto(Item item, Collection<CommentDto> comments) {
-        ItemCommentDto itemCommentDto = new ItemCommentDto();
-        itemCommentDto.setId(item.getId());
-        itemCommentDto.setName(item.getName());
-        itemCommentDto.setDescription(item.getDescription());
-        itemCommentDto.setAvailable(item.getAvailable());
-        itemCommentDto.setComments(comments);
-        return itemCommentDto;
-    }
-
     public static ItemCommentDateDto mapToItemCommentDateDto(Item item,
                                                              Collection<CommentDto> comments,
                                                              BookingInfoDto nextBooking,

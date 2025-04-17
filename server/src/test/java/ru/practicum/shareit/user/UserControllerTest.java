@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.TestData;
 
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.SameEmailException;
 import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -49,6 +51,18 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Не должен получать пользователя если он не существует")
+    void shouldNotGetUser() throws Exception {
+
+        Long userId = 99L;
+        when(userService.getUser(userId)).thenThrow(NotFoundException.class);
+        mockMvc.perform(
+                        get("/users/{userId}", userId))
+                .andExpect(status().isNotFound());
+        verify(userService, times(1)).getUser(userId);
+    }
+
+    @Test
     @DisplayName("Создать пользователя")
     void createUser() throws Exception {
 
@@ -65,6 +79,22 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(newUserRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDto)));
+        verify(userService, times(1)).createUser(newUserRequest);
+    }
+
+    @Test
+    @DisplayName("Не создавать пользователя если такой email уже есть ")
+    void shouldNotCreateUserWithSameEmail() throws Exception {
+
+        NewUserRequest newUserRequest = new NewUserRequest();
+        newUserRequest.setName("test");
+        newUserRequest.setEmail("test@test.com");
+        when(userService.createUser(newUserRequest)).thenThrow(SameEmailException.class);
+        mockMvc.perform(
+                        post("/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(newUserRequest)))
+                .andExpect(status().isConflict());
         verify(userService, times(1)).createUser(newUserRequest);
     }
 
