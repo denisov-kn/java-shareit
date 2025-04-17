@@ -4,7 +4,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.item.comments.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCommentDateDto;
-import ru.practicum.shareit.item.dto.ItemCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
 import ru.practicum.shareit.request.ItemRequest;
