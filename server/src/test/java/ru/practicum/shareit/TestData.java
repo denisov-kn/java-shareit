@@ -307,6 +307,10 @@ public class TestData {
         return itemRequestItemsDtoList.get(id);
     }
 
+    public static List<ItemRequestItemsDto> getAllItemRequestItemsDto() {
+        return new ArrayList<>(itemRequestItemsDtoList.values());
+    }
+
     //Comment
     private static final CommentDto commentDto1 = CommentDto.builder()
             .id(1L)

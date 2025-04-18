@@ -375,6 +375,23 @@ WHERE b.item.owner.id = :ownerId
         assertEquals(itemDto, itemDtoFromDB, "Вещь созданная через сервис должна находиться в БД");
     }
 
+
+    @Test
+    @DisplayName("Не должен создать вещь если запрос не существует - createItem")
+    void shouldNotCreateItemWithWrongRequest() {
+
+        Long ownerId = 4L;
+
+        NewItemRequest newItemRequest = new NewItemRequest();
+        newItemRequest.setAvailable(false);
+        newItemRequest.setName("Вещь10");
+        newItemRequest.setDescription("Описание Вещь10");
+        newItemRequest.setRequestId(99L);
+
+        assertThrows(NotFoundException.class, () -> itemService.createItem(ownerId, newItemRequest),
+                "Не должен создать вещь если запрос не существует");
+    }
+
     @Test
     @DisplayName("Не должен создать комментарий пока не закончилось бронирование - createComment")
     void shouldNotCreateCommentByTime() {

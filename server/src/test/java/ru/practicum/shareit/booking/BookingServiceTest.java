@@ -84,8 +84,6 @@ class BookingServiceTest {
 
     }
 
-
-
     private BookingDto getBookingDtoFromDB(Long bookingId) {
         TypedQuery<Booking> query = em.createQuery("select b from Booking b where b.id = :bookingId", Booking.class);
         query.setParameter("bookingId", bookingId);
@@ -284,21 +282,6 @@ class BookingServiceTest {
                 "Список бронирований сервиса должен содержать все записи из БД");
         assertTrue(bookingDtoFromDB.containsAll(bookingDtoList),
                 "Список бронирований из БД должен содержать все записи из сервиса");
-    }
-
-    @Test
-    @DisplayName("Не должен создавать бронирование если дата начала бронирование позже даты окончания")
-    void shouldNotCreateBookingWithWrongDate() {
-
-        Long itemId = 2L;
-        Long bookerId = 6L;
-
-        NewBookingRequest newBookingRequest = new NewBookingRequest();
-        newBookingRequest.setStart(LocalDateTime.now().plusDays(7));
-        newBookingRequest.setEnd(LocalDateTime.now().plusDays(1));
-        newBookingRequest.setItemId(itemId);
-
-        assertThrows(BadRequestException.class, () -> bookingService.createBooking(newBookingRequest, bookerId));
     }
 
     @Test

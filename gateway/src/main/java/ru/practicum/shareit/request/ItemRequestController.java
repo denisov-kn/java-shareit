@@ -32,8 +32,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAll() {
-        return itemRequestClient.getAll();
+    public ResponseEntity<Object> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemRequestClient.getAll(userId);
     }
 
     @GetMapping("{requestId}")

@@ -16,7 +16,6 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,16 +51,6 @@ public class BookingService {
     }
 
     public BookingDto createBooking(NewBookingRequest newBookingRequest, Long userId) {
-
-        LocalDateTime endDate = newBookingRequest.getEnd();
-        LocalDateTime startDate = newBookingRequest.getStart();
-
-        if (endDate.isEqual(startDate) || endDate.isBefore(startDate)) {
-            throw new BadRequestException("Время начала бронирования (" +
-                    newBookingRequest.getStart() + ") "
-                    + "не может быть равным или больше времени окончания ("
-                    + newBookingRequest.getEnd() + ")");
-        }
 
 
         User booker = checkUser(userId);

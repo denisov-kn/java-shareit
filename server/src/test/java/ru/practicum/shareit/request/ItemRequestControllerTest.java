@@ -66,7 +66,7 @@ class ItemRequestControllerTest {
     @DisplayName("Найти все запросы для пользователя")
     void getAllForUser() throws Exception {
         Long userId = 1L;
-        List<ItemRequestDto> itemRequestDtoList = TestData.getALLItemRequestDto();
+        List<ItemRequestItemsDto> itemRequestDtoList = TestData.getAllItemRequestItemsDto();
 
         when(itemRequestService.getAllForUser(userId)).thenReturn(itemRequestDtoList);
 
@@ -82,14 +82,17 @@ class ItemRequestControllerTest {
     @Test
     @DisplayName("Найти все запросы")
     void getAll() throws Exception {
+        Long userId = 1L;
+
         List<ItemRequestDto> itemRequestDtoList = TestData.getALLItemRequestDto();
 
-        when(itemRequestService.getAll()).thenReturn(itemRequestDtoList);
+        when(itemRequestService.getAll(userId)).thenReturn(itemRequestDtoList);
         mockMvc.perform(
-                get("/requests/all"))
+                get("/requests/all")
+                        .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemRequestDtoList)));
-        verify(itemRequestService, times(1)).getAll();
+        verify(itemRequestService, times(1)).getAll(userId);
     }
 
     @Test

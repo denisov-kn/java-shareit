@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -23,6 +24,7 @@ public class ItemRequestService {
     private final ItemRequestStorage itemRequestStorage;
     private final UserStorage userStorage;
     private final ItemStorage itemStorage;
+    private final ItemService itemService;
 
     public ItemRequestDto create(NewItemRequestDto newItemRequestDto, Long userId) {
         User user = checkUser(userId);
@@ -30,15 +32,29 @@ public class ItemRequestService {
         return ItemRequestMapper.mapToItemRequestDto(itemRequest);
     }
 
-    public List<ItemRequestDto> getAllForUser(Long userId) {
+    public List<ItemRequestItemsDto> getAllForUser(Long userId) {
         checkUser(userId);
-        return itemRequestStorage.findByRequestor_Id(userId).stream()
-                .map(ItemRequestMapper::mapToItemRequestDto)
+        List<ItemRequest> requests = itemRequestStorage.findByRequestor_Id(userId);
+        List<Long> requestIds = requests.stream()
+                .map(ItemRequest::getId)
+                .toList();
+        Collection<Item> itemList = itemStorage.searchItemsByItemRequestIdIn(requestIds);
+
+        return  requests.stream()
+                .map(request -> {
+                            List<ItemDto> itemsDtoForRequest = itemList.stream()
+                                    .filter(item -> item.getItemRequest().getId().equals(request.getId()))
+                                    .map(ItemMapper::mapToItemDto)
+                                    .toList();
+
+                            return ItemRequestMapper.mapToItemRequestItemsDto(request, itemsDtoForRequest);
+                        })
                 .toList();
     }
 
-    public List<ItemRequestDto> getAll() {
+    public List<ItemRequestDto> getAll(Long userId) {
         return  itemRequestStorage.findAll().stream()
+                .filter(item -> !item.getRequestor().getId().equals(userId))
                 .map(ItemRequestMapper::mapToItemRequestDto)
                 .toList();
     }

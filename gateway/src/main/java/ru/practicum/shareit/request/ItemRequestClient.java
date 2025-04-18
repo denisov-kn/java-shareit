@@ -33,8 +33,8 @@ public class ItemRequestClient extends BaseClient {
         return get("",userId);
     }
 
-    public ResponseEntity<Object> getAll() {
-        return get("/all");
+    public ResponseEntity<Object> getAll(Long userId) {
+        return get("/all", userId);
     }
 
     public ResponseEntity<Object> getRequest(Long requestId) {

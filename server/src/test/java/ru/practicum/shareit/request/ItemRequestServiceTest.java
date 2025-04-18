@@ -16,7 +16,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestItemsDto;
 import ru.practicum.shareit.request.dto.NewItemRequestDto;
 
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,13 +56,34 @@ class ItemRequestServiceTest {
     @DisplayName("Получить все запросы одного пользователя  - getAllForUser")
     void getAllForUser() {
 
-        List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllForUser(2L);
+        Long userId = 2L;
+
+        List<ItemRequestItemsDto> itemRequestsDto = itemRequestService.getAllForUser(userId);
 
         TypedQuery<ItemRequest> queryRequest = em.createQuery("select i from ItemRequest i where i.requestor.id = :requestorId", ItemRequest.class);
-        queryRequest.setParameter("requestorId", 2L);
+        queryRequest.setParameter("requestorId", userId);
         List<ItemRequest> itemRequestsFromDb = queryRequest.getResultList();
-        List<ItemRequestDto> itemRequestsDtoFromDB = itemRequestsFromDb.stream()
-                .map(ItemRequestMapper::mapToItemRequestDto)
+
+        List<Long> requestIds = itemRequestsFromDb.stream()
+                .map(ItemRequest::getId)
+                .toList();
+
+        TypedQuery<Item> queryItem = em.createQuery("select i from Item i where i.itemRequest.id in :itemRequestIds", Item.class);
+        queryItem.setParameter("itemRequestIds", requestIds);
+        List<Item> itemsFromDb = queryItem.getResultList();
+
+
+        List<ItemRequestItemsDto> itemRequestsDtoFromDB = itemRequestsFromDb.stream()
+                .map(itemRequest -> {
+                    List<ItemDto> itemsDtoForRequest = itemsFromDb.stream()
+                            .filter(item -> item.getItemRequest().getId().equals(itemRequest.getId()))
+                            .map(ItemMapper::mapToItemDto)
+                            .toList();
+                    return  ItemRequestMapper.mapToItemRequestItemsDto(
+                            itemRequest,
+                            itemsDtoForRequest
+                    );
+                })
                 .toList();
 
         assertEquals(itemRequestsDto.size(), itemRequestsDtoFromDB.size(),
@@ -79,9 +99,13 @@ class ItemRequestServiceTest {
     @DisplayName("Получить все запросы - getAll")
     void getAll() {
 
-        List<ItemRequestDto> itemRequestsDto = itemRequestService.getAll();
 
-        TypedQuery<ItemRequest> queryRequest = em.createQuery("select i from ItemRequest i", ItemRequest.class);
+        Long userId = 1L;
+
+        List<ItemRequestDto> itemRequestsDto = itemRequestService.getAll(userId);
+
+        TypedQuery<ItemRequest> queryRequest = em.createQuery("select i from ItemRequest i where i.requestor.id != :userId ", ItemRequest.class);
+        queryRequest.setParameter("userId", userId);
         List<ItemRequest> itemRequestsFromDb = queryRequest.getResultList();
         List<ItemRequestDto> itemRequestsDtoFromDB = itemRequestsFromDb.stream()
                 .map(ItemRequestMapper::mapToItemRequestDto)

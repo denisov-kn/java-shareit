@@ -26,7 +26,6 @@ public class ErrorHandlingControllerAdvice {
         );
     }
 
-
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

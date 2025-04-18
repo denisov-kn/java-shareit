@@ -107,8 +107,6 @@ public class ItemService {
     }
 
     public List<ItemDto> searchItems(String text, Long userId) {
-        if (text.isEmpty())
-            return new ArrayList<>();
         checkUser(userId);
         return itemStorage.searchItemsByNameOrDescription(text).stream()
                 .map(ItemMapper::mapToItemDto)
@@ -120,7 +118,8 @@ public class ItemService {
         ItemRequest itemRequest = null;
 
         if (request.getRequestId() != null) {
-            itemRequest = itemRequestStorage.findById(request.getRequestId()).orElse(null);
+            itemRequest = itemRequestStorage.findById(request.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос с id " + request.getRequestId() + " не найден"));
         }
 
         Item item = ItemMapper.mapToItem(request, user, itemRequest);

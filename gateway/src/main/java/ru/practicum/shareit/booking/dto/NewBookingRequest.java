@@ -3,10 +3,12 @@ package ru.practicum.shareit.booking.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.validator.ValidBookingDates;
 
 import java.time.LocalDateTime;
 
 @Data
+@ValidBookingDates
 public class NewBookingRequest {
 
     @NotNull(message = "Дата начала бронирования не может быть пустым")

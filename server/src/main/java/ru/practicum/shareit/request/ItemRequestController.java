@@ -24,14 +24,14 @@ public class ItemRequestController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ItemRequestDto> getAllForUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemRequestItemsDto> getAllForUser(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemRequestService.getAllForUser(userId);
     }
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ItemRequestDto> getAll() {
-        return itemRequestService.getAll();
+    public Collection<ItemRequestDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemRequestService.getAll(userId);
     }
 
     @GetMapping("{requestId}")

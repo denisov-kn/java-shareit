@@ -28,4 +28,6 @@ public interface ItemStorage extends JpaRepository<Item, Long> {
 
     Collection<Item> searchItemsByItemRequest_Id(Long id);
 
+    Collection<Item> searchItemsByItemRequestIdIn(Collection<Long> ids);
+
 }
